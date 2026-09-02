@@ -90,12 +90,80 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
    * Rebooted the client machine, successfully breaking the local isolation barrier and exposing the network to corporate network parameters.
 
    ![Welcome to Domain Dialog](images/welcome%20to%20domain.png)
-   *Figure 1: Successful verification dialog box demonstrating the Windows 11 client resolving DNS and authenticating directly into the helpdesk.local environment.
+---
+
+## 4. Hands-on Helpdesk Simulation Tickets & Resolution Logs
+
+To simulate the day-to-day operations of an Enterprise Desktop Support Technician, I used my Active Directory lab sandbox to run five real-world helpdesk troubleshooting scenarios. 
+
+### 🎫 Ticket #001: New Employee Onboarding & Account Provisioning
+* **User Issue:** HR submitted a ticket requesting a new corporate account for a new hire, **Ellice Patindol**, starting today in the Operations department.
+* **Troubleshooting & Actions Taken:**
+  1. Logged into **VM 2 (Domain Controller)** and opened **Active Directory Users and Computers (ADUC)**.
+  2. Targeted the custom `Company Users` Organizational Unit (OU).
+  3. Provisioned a new User Object: First Name: `Ellice`, Last Name: `Patindol`, User Logon Name: `ElliceP`.
+  4. Assigned a strong temporary infrastructure password (`InitialWelcome2026!`).
+  5. Enforced security alignment by checking the box: **"User must change password at next logon"**.
+* **Resolution Verification:** Switched to **VM 3 (Windows 11 Client)**. Logged in using `ElliceP`. The client machine successfully intercepted the credential and forced a mandatory password change before granting desktop access. 
+
+### 🎫 Ticket #002: Account Lockout Due to Credential Mismatch
+* **User Issue:** User `ElliceP` called the helpdesk stating she is locked out of her computer. She receives an error: *"The referenced account is currently locked out and may not be logged on to."*
+* **Troubleshooting & Actions Taken:**
+  1. Interviewed the user; she admitted to typing her new password incorrectly multiple times on a mobile device sync loop.
+  2. Navigated to **VM 2 (Domain Controller)** → **ADUC**.
+  3. Located the `ElliceP` account inside the `Company Users` OU, right-clicked, and opened **Properties**.
+  4. Selected the **Account** tab.
+  5. Identified the active warning checkmark: *"Account is currently locked out on this Active Directory Domain Controller"*.
+  6. Checked the box to **Unlock account**, then clicked **Apply** and **OK**.
+* **Resolution Verification:** Instructed the user to try logging in again on VM 3. The account successfully authenticated without further lockouts.
+
+### 🎫 Ticket #003: "The Trust Relationship Failed" Secure Channel Broken
+* **User Issue:** The Windows 11 client machine was left turned off for several months. Upon booting up, the user receives an error: *"The trust relationship between this workstation and the primary domain failed."*
+* **Troubleshooting & Actions Taken:**
+  1. Recognized that the workstation's secure machine account password had desynchronized from the Active Directory database.
+  2. Logged into **VM 3 (Client)** using the local fallback administrator account (`.\TechSupport`) instead of the domain path.
+  3. Opened PowerShell as an Administrator and tested the secure channel integrity by running: `Test-ComputerSecureChannel`. The terminal returned `False`, confirming a broken secure identity channel.
+  4. Repaired the active trust identity without removing the machine from the domain by executing:
+     ```powershell
+     Test-ComputerSecureChannel -Credential (Get-Credential) -Repair
+     ```
+  5. Authenticated the repair request using the `helpdesk.local\Administrator` credentials when prompted.
+* **Resolution Verification:** Ran the test command again, returning a status of `True`. Rebooted VM 3 and successfully authenticated into the user profile.
+
+### 🎫 Ticket #004: Corporate Control Panel Restriction via Group Policy
+* **User Issue:** Corporate Security policy mandates that standard workstation users should be blocked from tampering with system settings via the legacy Windows Control Panel.
+* **Troubleshooting & Actions Taken:**
+  1. Logged into **VM 2 (Domain Controller)** and opened **Group Policy Management** (`gpmc.msc`).
+  2. Right-clicked the domain root `helpdesk.local` and selected **Create a GPO in this domain, and Link it here...**
+  3. Named the rule **`GPO-Restrict-ControlPanel`**.
+  4. Right-clicked the new GPO and chose **Edit** to open the Group Policy Management Editor.
+  5. Navigated to: `User Configuration` → `Policies` → `Administrative Templates` → `Control Panel`.
+  6. Located and double-clicked **Prohibit access to Control Panel and PC settings**. Changed the status to **Enabled**, clicked **Apply**, and saved.
+* **Resolution Verification:** Switched to **VM 3 (Windows 11 Client)** under user account `ElliceP`. Opened Command Prompt and ran `gpupdate /force` to pull down the new policy rules. Attempted to open the Control Panel, and the system blocked it, displaying: *"This operation has been canceled due to restrictions in effect on this computer."*
+
+### 🎫 Ticket #005: Client Network Connectivity & DNS Resolution Failure
+* **User Issue:** The user on VM 3 states they cannot reach internal shared folders or authenticate using domain tools. Local command testing states the domain controller cannot be located.
+* **Troubleshooting & Actions Taken:**
+  1. Remotely walked the user through troubleshooting steps. Opened Command Prompt on **VM 3** and ran `ipconfig /all`.
+  2. Analyzed the network dump. Discovered that the Client VM had an IP of `169.254.X.X` (APIPA address), meaning it was completely disconnected from the static network schema.
+  3. Discovered that the network card settings inside VirtualBox had defaulted back to NAT instead of the internal network switch.
+  4. Shut down VM 3, went to VirtualBox Settings → **Network** → set Adapter 1 back to **Internal Network** with the exact name matching VM 2 (`AD-Helpdesk-Net`).
+  5. Booted the VM, opened `ncpa.cpl`, and verified that the manual static parameters (`IP: 192.168.10.50` / `DNS: 192.168.10.10`) were correctly initialized.
+* **Resolution Verification:** Executed `nslookup helpdesk.local` from the client terminal. The machine immediately resolved back to the server address `192.168.10.10` with zero dropped packets.
 
 ---
 
-## 4. Key Takeaways & Applied Helpdesk Competencies
+## 5. Future Lab Roadmap & Expansions
+To further enhance my systems administration capabilities, I plan to deploy the following additions to this environment:
+* **DHCP Server Integration:** Install and configure the DHCP Server Role on VM 2 to automatically assign IP addresses dynamically within the `192.168.10.50 - 192.168.10.254` range, eliminating manual client IP configurations.
+* **Enterprise File Shares (SMB):** Set up a centralized File Server with custom security permissions (NTFS/Share Permissions) to simulate corporate departmental drives.
+* **Active Directory Server 2025 Upgrades:** Utilize the secondary server node slot to practice multi-domain controller replication scenarios and explore newer forest functional tier upgrades.
+
+---
+
+## 6. Key Takeaways & Applied Helpdesk Competencies
 Through this project, I engineered and mastered fundamental infrastructure layers critical to enterprise desktop support roles:
 * **Network Isolation Principles:** Understanding layer-2 mapping via VirtualBox internal configurations.
 * **Identity & Access Management (IAM):** Creating security structures, OUs, and implementing mandatory initial login security parameters.
 * **DNS Resolution Mechanics:** Troubleshooting network endpoints by forcing endpoints to interact with targeted host address mappings.
+
