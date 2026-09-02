@@ -32,7 +32,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
    * Navigated to VM Settings → **Network**.
    * Modified Adapter 1 from NAT to **Internal Network** and assigned the unique identifier string: `AD-Helpdesk-Net`.
    
-   ![VirtualBox Network Settings for VM 2 here](images/network-settings.png)
+   ![VirtualBox Network Settings for VM 2](images/network-settings.png)
 
 3. **Operating System Installation:**
    * Booted the VM and selected the **Standard Evaluation (Desktop Experience)** tier to establish a Graphical User Interface (GUI).
