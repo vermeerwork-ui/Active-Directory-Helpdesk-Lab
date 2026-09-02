@@ -32,7 +32,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
    * Navigated to VM Settings → **Network**.
    * Modified Adapter 1 from NAT to **Internal Network** and assigned the unique identifier string: `AD-Helpdesk-Net`.
    
-   *[Insert Screenshot of VirtualBox Network Settings for VM 2 here]*
+   ![VirtualBox Network Settings for VM 2 here](images/network-settings.png)
 
 3. **Operating System Installation:**
    * Booted the VM and selected the **Standard Evaluation (Desktop Experience)** tier to establish a Graphical User Interface (GUI).
@@ -45,7 +45,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
      * **Subnet Mask:** `255.255.255.0`
      * **Preferred DNS Server:** `192.168.10.10` (Self-referencing layout required for AD infrastructure initialization).
      
-   *[Insert Screenshot of Windows Server IPv4 Properties here]*
+   ![Windows Server IPv4 Properties here](images/ipv4.png)
 
 5. **Active Directory Domain Services (AD DS) Promotion:**
    * Launched **Server Manager** → **Add Roles and Features** → Checked **Active Directory Domain Services**.
@@ -57,7 +57,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
 ### Phase 2: Deploying and Configuring VM 3 (The Windows 11 Corporate Client)
 
 1. **Workstation Provisioning:**
-   * Initiated a parallel VM matrix profile in VirtualBox named `Windows-11-Client`.
+   * Initiated a parallel VM matrix profile in VirtualBox named `Windows11-Client`.
    * Attached the official multi-edition Windows 11 ISO.
    * Hardened the system footprint layout allocating **4096 MB RAM** and **2 vCPUs** to meet Windows 11 architectural prerequisites.
    * Initialized a **50 GB virtual disk container**.
@@ -81,7 +81,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
    * Designed a root-tier Organizational Unit (OU) labeled `Company Users` to segment normal human capital from default administrative containers.
    * Created a practice identity object: `Ellice Patindol` (User Logon Name: `ElliceP`). Enabled the security flag: *User must change password at next logon*.
 
-   *[Insert Screenshot of Active Directory Users and Computers displaying the new user account here]*
+   ![Active Directory Users and Computers displaying the new user account here](images/feline1.png)
 
 2. **Domain Ingestion (Joining VM 3 to helpdesk.local):**
    * Navigated to **Advanced System Settings** on VM 3 -> **Computer Name** -> **Change**.
@@ -89,7 +89,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
    * Successfully passed the authentication check using domain administrator permissions (`HELPDESK\Administrator`).
    * Rebooted the client machine, successfully breaking the local isolation barrier and exposing the network to corporate network parameters.
 
-   ![Screenshot 1: Welcome to Domain Dialog](path/to/your/screenshot1.png)
+   ![Welcome to Domain Dialog](images/welcome%20to%20domain.png)
    *Figure 1: Successful verification dialog box demonstrating the Windows 11 client resolving DNS and authenticating directly into the helpdesk.local environment.
 
 ---
