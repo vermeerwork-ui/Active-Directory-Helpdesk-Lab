@@ -45,7 +45,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
      * **Subnet Mask:** `255.255.255.0`
      * **Preferred DNS Server:** `192.168.10.10` (Self-referencing layout required for AD infrastructure initialization).
      
-   ![Windows Server IPv4 Properties here](images/ipv4.png)
+   ![Windows Server IPv4 Properties](images/ipv4.png)
 
 5. **Active Directory Domain Services (AD DS) Promotion:**
    * Launched **Server Manager** → **Add Roles and Features** → Checked **Active Directory Domain Services**.
@@ -81,7 +81,7 @@ To ensure complete isolation from my physical home network (preventing rogue DHC
    * Designed a root-tier Organizational Unit (OU) labeled `Company Users` to segment normal human capital from default administrative containers.
    * Created a practice identity object: `Ellice Patindol` (User Logon Name: `ElliceP`). Enabled the security flag: *User must change password at next logon*.
 
-   ![Active Directory Users and Computers displaying the new user account here](images/feline1.png)
+   ![Active Directory Users and Computers displaying the new user account](images/feline1.png)
 
 2. **Domain Ingestion (Joining VM 3 to helpdesk.local):**
    * Navigated to **Advanced System Settings** on VM 3 -> **Computer Name** -> **Change**.
